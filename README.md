@@ -1,1 +1,1 @@
-Snitch :clothing barnd platform by shri ji
+Snitch :clothing brand platform by shri ji
