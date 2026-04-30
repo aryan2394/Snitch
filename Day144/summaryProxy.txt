@@ -1,0 +1,6 @@
+dekho maanlo aap ho browser mein 5173/login pe and aap submit dabaye toh kya hoga ki aapka request jo hai localhsot:5173/api/auth/login
+pe jayega kyon kyonki auth.api.js pe agar aap hosta nd post defined nahi karoge toh browser ussi tab ka host and port use karega 
+thik hai toh ab request gayai hai 5173/api/auth/login 
+lekin humne vite.config.js mein ek proxy lagake rakhi huwi hai ki agar /api se koi bhi request aaye jo ki aayi hai toh ab aap usko localhost:3000 pe redirect kar do 
+toh ab backend se data aata hai and response mil jaata hai 
+

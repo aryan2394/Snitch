@@ -1,0 +1,36 @@
+ cors  pata hai kyon use karte hai hum because borowser reject kar deta hai crossOrigin request ko matlab 
+// backend is runnign on 3000 and frontend is running on 5173 
+// jab hum maalo http:localhost:5173/register page mein hai browser mein and jab user apna form regsieter wala detaisl bhar ke submit krta hai then wo details saari jaati hai 
+// in localhost/3000/api/auth/regsieter jo ki diffenrt origin hai 
+// and haumre bRWOSER JO hai ek hi site ya ek page mein rahte huwe jo ki differnt url mein chal raha hai and diffenrt url mein jaana chahe ussi same page se toh not possible
+
+isliye wo warnign deta hai ki you (browser) are trying to use the cross origin and jo ki not allowed and it is out of the cors policy 
+
+isse bachne ke liye we use cors and set up in backend but humein iski jaroorat nahi hai matlab tab wo error ya warning dega 
+
+SO TODAY'S TOPIC IS PROXY 
+
+PAHLE DEKHO KARNA KYA HAI FRONTEND MEIN HI SAB CHANGES KARNE HAI 
+1:VITE.CONFIG.JS:usmein jaake likho proxy
+
+2:then go to your auth.api.js(features mein auth mein serveice mein hai):
+
+and waha pe jaake origin ko set kar do :from "http:localhost:3000/api/auth" to "/api/auth" buss itna hi 
+
+
+iska matlab aapne kiya kya hai ki humein do differnt url ki jarroart nahi hai aap is bhi browser pe chalo raheoge ussi ke aage /api/auth/register ya login ka khul jayega 
+
+matlab jab PAHLE frontend se login karna chahte the toh cors laga dete the and differnt orgin mein reuqest karte the that is http:localhost:3000/api/auth/register
+lekin ab hum http:localhost:5173/api/auth/register pe hi request kar rahe hai and isliye ab cors ki bhi jaroorat nahi hai 
+
+huwa kya kyon aur kaise ye pata nahi chal raha hai 
+
+// dekho ab aap jab browser se request karoge ki mujhe login karna hai lekin aapne baseurl toh bataya hi nahi nahi hi aapne port numbere bataya hai matlab 
+    // lekin aap keh rahe ho ki user jab jab button par click karein tab wo /api/auth/login pe aa jaaye beacuse aapne buss itna hi bataya hai baseurl and login function ke hisab se 
+    // toh browser kya karega ki aapne toh n url bataya bataya n host (3000 ya 8000 ya kuch bhi) toh brosswer jis tab mein hai and jo url use kar raha hai 
+    // ussi se wo host and url le lega and aage ke request ko bhej dega 
+    // matlab brwoser is runnign on localhost:5173 and hum waha se login data bhejana cha rahe hai lkein hum toh sirf bole ki /api/auth/login pe ye data bhej do 
+    // lekin url bataya nahi toh browser jo hai wo localshot:5173/auth/api/login pe data bhe dega 
+    
+
+
