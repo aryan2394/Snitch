@@ -49,3 +49,8 @@ export async function login(req,res)
         res.status(500).json({message:"Internal server error"});
     }
 }
+export const googleCallback=async(req,res)=>
+{
+    console.log(req.user);
+    return res.redirect("http://localhost:5173/");
+}

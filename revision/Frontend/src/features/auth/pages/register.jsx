@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router';
 import {useAuth} from "../hook/useAuth.js"
-// import ContinueWithGoogle from '../components/ContinueWithGoogle.jsx';
+import ContinueWithGoogle from '../components/ContinueWithGoogle.jsx';
 const Register = () => {
     const navigate = useNavigate();
     const {handleRegister}=useAuth()
@@ -259,7 +259,7 @@ const Register = () => {
                             </label>
 
                             {/* Continue with Google Button */}
-                           {/* <ContinueWithGoogle/> */}
+                           <ContinueWithGoogle/>
                             {/* Sign Up Button */}
                             <button
                                 type="submit"
