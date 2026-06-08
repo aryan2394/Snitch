@@ -1,0 +1,5 @@
+humara problem statement hai seller can create the product and can see its product
+humne first part create bana diya ki user(seller) can create the product 
+second part that seller can see all its product 
+
+toh sabse pahle humnein routes banana hoga and usko protected banana hoga 
