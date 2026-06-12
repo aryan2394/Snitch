@@ -1,4 +1,5 @@
 import userModel from "../models/user.model.js";
+import jwt from "jsonwebtoken"
 import { generateToken } from "../utils/generateToken.js";
 export const register = async (req, res) => {
     const { email, contact, password, fullname, isSeller } = req.body;

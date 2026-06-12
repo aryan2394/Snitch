@@ -3,7 +3,7 @@ import generateToken from "../utils/generateToken.js";
 export async function register(req,res)
 {
     try{
-        const {email,password,fullName,contact,isSeller}=req.body;
+        const {email,password,fullname,contact,isSeller}=req.body;
         const isUserExist=await userModel.findOne({email});
         if(isUserExist)
         {
@@ -15,7 +15,7 @@ export async function register(req,res)
         const user=await userModel.create({
             email,
             password,
-            fullName,
+            fullname,  
             contact,
             role:isSeller?"seller":"buyer",
         });
@@ -77,3 +77,10 @@ export async function getMe(req,res)
         })
     }
 }
+export async function googleCallback(req,res)
+{
+    // console.log(req.user);
+    // return res.json(req.user); 
+    const {id,displayName,emails}=req.user; 
+    const email=emails[0].value;
+} 
