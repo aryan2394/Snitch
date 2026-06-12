@@ -12,12 +12,12 @@ const userSchema=new mongoose.Schema({
         {
             return !this.googleId 
         },
-        unique:true 
     },
     contact:{
         type:String,
         required:false,
-        unique:true
+        unique:true,
+        sparse:true 
     },
     fullname:{
         type:String,
@@ -25,7 +25,7 @@ const userSchema=new mongoose.Schema({
     },
     role:{
         type:String,
-        enum:["buyer","seller"],
+        enum:["buyer","seller","pending"],
         default:"buyer",
         required:true
     },

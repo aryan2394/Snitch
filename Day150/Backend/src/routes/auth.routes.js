@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import passport from 'passport';
-import { register, login, googleCallback, getMe } from '../controllers/auth.controller.js';
+import { register, login, googleCallback, getMe, updateRole } from '../controllers/auth.controller.js';
 import { registerValidation, loginValidation } from '../validator/auth.validator.js';
 import { authenticateSeller, authenticateUser } from '../middlewares/auth.middleware.js';
 const router = Router();
@@ -40,5 +40,9 @@ router.get("/google/callback",
 // @access: Private
 router.get("/me", authenticateUser, getMe);
 
+// @route:  PUT /auth/update-role
+// @desc:   Update user role (buyer/seller)
+// @access: Private
+router.put("/update-role", authenticateUser, updateRole);
 
 export default router;  

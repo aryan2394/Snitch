@@ -33,3 +33,13 @@ export async function getMe() {
         throw err.response?.data || { message: err.message || 'Network Error' };
     }
 }
+export async function updateRole({ role }) {
+    try {
+        const response = await authApiInstance.put("/update-role", { role });
+        return response.data;
+    }
+    catch (err) {
+        console.log(err);
+        throw err.response?.data || { message: err.message || 'Network Error' };
+    }
+}

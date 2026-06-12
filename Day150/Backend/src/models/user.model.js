@@ -11,7 +11,8 @@ const userSchema = new mongoose.Schema({
     contact:{
         type:String,
         required:false,
-        unique:true
+        unique:true,
+        sparse:true
     },
     password:{
         type:String,
@@ -25,7 +26,7 @@ const userSchema = new mongoose.Schema({
     },
     role:{
         type:String,
-        enum:["buyer","seller"],
+        enum:["buyer","seller","pending"],
         required:true,
         default:"buyer"
     },

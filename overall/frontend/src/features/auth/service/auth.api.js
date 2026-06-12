@@ -24,3 +24,23 @@ export async function login({email,password})
         throw error.response?.data?.message || error.message;
     }
 }
+export async function getMe()
+{
+    try {
+        const response=await authApiInstance.get("/me");
+        return response.data;
+    } catch (error) {
+        console.log(error);
+        throw error.response?.data?.message || error.message;
+    }
+}
+export async function updateRole({role})
+{
+    try {
+        const response=await authApiInstance.put("/update-role",{role});
+        return response.data;
+    } catch (error) {
+        console.log(error);
+        throw error.response?.data?.message || error.message;
+    }
+}

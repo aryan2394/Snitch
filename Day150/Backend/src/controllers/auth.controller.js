@@ -43,29 +43,38 @@ export async function login(req, res) {
     }
 }
 export const googleCallback = async (req, res) => {
-    // console.log(req.user);
-    const { id, displayName, emails } = req.user;
-    const email = emails[0].value;
-    let user = await userModel.findOne({ email });
-    if (!user) {
-        user = await userModel.create({
-            email,
-            fullname: displayName,
-            googleId: id
-        })
-    }
-    const token = jwt.sign(
-        {
-            id: user._id,
-            email: user.email
-        },
-        process.env.JWT_SECRET,
-        {
-            expiresIn: "7d"
+    try {
+        const { id, displayName, emails } = req.user;
+        const email = emails[0].value;
+        let user = await userModel.findOne({ email });
+        if (!user) {
+            user = await userModel.create({
+                email,
+                fullname: displayName,
+                googleId: id,
+                role: "pending"
+            })
         }
-    )
-    res.cookie("token", token);
-    return res.redirect("http://localhost:5173/");
+        const token = jwt.sign(
+            {
+                id: user._id,
+                email: user.email
+            },
+            process.env.JWT_SECRET,
+            {
+                expiresIn: "7d"
+            }
+        )
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "lax",
+        });
+        return res.redirect("http://localhost:5173");
+    } catch (error) {
+        console.error("Google Callback Error:", error);
+        return res.redirect("http://localhost:5173/login?error=auth_failed");
+    }
 }
 export const getMe = async (req, res) => {
     try {
@@ -83,5 +92,48 @@ export const getMe = async (req, res) => {
     } catch (err) {
         console.log(err);
         res.status(500).json({ message: "Internal server error" });
+    }
+}
+
+export const updateRole = async (req, res) => {
+    try {
+        const { role } = req.body;
+
+        if (!["buyer", "seller"].includes(role)) {
+            return res.status(400).json({
+                status: false,
+                message: "Invalid role selected",
+            });
+        }
+
+        const user = await userModel.findByIdAndUpdate(
+            req.user._id,
+            { role },
+            { new: true }
+        );
+
+        if (!user) {
+            return res.status(404).json({
+                status: false,
+                message: "User not found",
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Role updated successfully",
+            user: {
+                id: user._id,
+                email: user.email,
+                fullname: user.fullname,
+                role: user.role
+            }
+        });
+    } catch (error) {
+        console.error("Update Role Error:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error",
+        });
     }
 }

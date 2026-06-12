@@ -21,14 +21,21 @@ const Register = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await handleRegister({
+            const user=await handleRegister({
                 email: formData.email,
                 contact: formData.contactNumber,
                 password: formData.password,
                 isSeller: formData.isSeller,
                 fullname: formData.fullName
             });
-            navigate("/");
+            if(user.role==="seller")
+            {
+                navigate("/seller/dashboard");
+            }
+            else
+            {
+                navigate("/");
+            }
         } catch (error) {
             console.error("Registration Error:", error);
         }
