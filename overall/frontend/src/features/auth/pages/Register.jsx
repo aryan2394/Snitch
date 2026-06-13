@@ -56,7 +56,7 @@ const Register = () => {
                 style={{ backgroundColor: '#fbf9f6', fontFamily: "'Inter', sans-serif" }}
             >
                 {/* ── LEFT: Editorial Image Panel ── */}
-                <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden" style={{ backgroundColor: '#f5f3f0' }}>
+                <div className="hidden lg:flex lg:w-1/2 lg:sticky lg:top-0 lg:h-screen relative overflow-hidden" style={{ backgroundColor: '#f5f3f0' }}>
                     <img
                         src="/snitch_editorial_warm.png"
                         alt="Snitch Fashion Editorial"

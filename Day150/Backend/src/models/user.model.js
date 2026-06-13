@@ -12,7 +12,9 @@ const userSchema = new mongoose.Schema({
         type:String,
         required:false,
         unique:true,
-        sparse:true
+        sparse:true 
+        // jab user regisetr karega with continue with google then uske paas contact nahi hoga butunique is true 
+        //sparse help kar raha hai to avoid conflict with multiple null values 
     },
     password:{
         type:String,
@@ -27,6 +29,8 @@ const userSchema = new mongoose.Schema({
     role:{
         type:String,
         enum:["buyer","seller","pending"],
+        // pending: role not selected yet ye feature mainly tab kaam aayeg when user is registering with continue with google tab hum usko as a pending role 
+        // store karenege and then wo jo bhi buyer ya seller select karega uske hisab se hum usko save kara denge then 
         required:true,
         default:"buyer"
     },

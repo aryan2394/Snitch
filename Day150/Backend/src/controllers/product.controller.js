@@ -74,7 +74,7 @@ export async function addProductVariant(req,res)
 
     const productId=req.params.productId;
     const product=await productModel.findOne({
-        id:productId,
+        _id:productId,
         seller:req.user._id,
     
     })
@@ -83,7 +83,7 @@ export async function addProductVariant(req,res)
     // ki wo product jo hai ussi seller ka hai tab hi allowed hai
     if(!product)
     {
-        res.status(404).json({
+        return res.status(404).json({
             message:"product not found",
             success:false,
             error:"Product not found"
@@ -92,15 +92,32 @@ export async function addProductVariant(req,res)
     
     const files=req.files;
     const images=[]
-    if(files && files.length > 0)
-     {
-        (await Promise.all(files.map(async(file)=>{
-            const image=await uploadFile({buffer:file.buffer,fileName:file.originalname})
-            return image
-        }))).push(image=>images.push(image))
-     }
-     const {stock,price}=req.body;
+    if (files && files.length > 0) {
+    const uploadedImages = await Promise.all(
+        files.map(async (file) => {
+            const image = await uploadFile({ buffer: file.buffer, fileName: file.originalname });
+            return image;
+        })
+    );
+    images.push(...uploadedImages);
+    }
+     const {stock}=req.body; 
+     const price=req.body.priceAmount;
      const attributes=JSON.parse(req.body.attributes || '{}'); 
      console.log(product,images,stock,price,attributes);
+     product.variants.push({
+        images:images,
+        stock:stock,
+        attributes:attributes,
+        price:{
+            amount:Number(price) || product.price.amount, 
+            currency:req.body.priceCurrency || product.price.currency,
+        }
+     });
+     await product.save();
+     res.status(201).json({
+        message:"variant created sucessfully",
+        success:true,
+        product
+     })
 } 
-  
