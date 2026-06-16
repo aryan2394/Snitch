@@ -17,16 +17,14 @@ export async function incrementCartItemApi({productId,variantId})
 {
     const response=await cartApiInstance.patch(`/quantity/increment/${productId}/${variantId}`);
     return response.data;
-} 
-
+}
 export async function decrementCartItemApi({productId,variantId})
 {
     const response=await cartApiInstance.patch(`/quantity/decrement/${productId}/${variantId}`);
     return response.data;
-}
-
+} 
 export async function removeCartItemApi({productId,variantId})
 {
     const response=await cartApiInstance.delete(`/remove/${productId}/${variantId}`);
     return response.data;
-}
+} 
