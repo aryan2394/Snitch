@@ -73,3 +73,48 @@ export async function getCart(req, res) {
         cart,
     })
 }
+export async function incrementCartItemQuantity(req,res)
+{
+    const {productId,variantId}=req.params;
+    const product=await productModel.findOne({
+        id:productId,
+        "variants._id":variantId
+    });
+    if(!product)
+    {
+        return res.status(404).json({
+            success:false,
+            message:"product or variant not found"
+        })
+    } 
+    const cart=await cartModel.findOne({user:req.user._id});
+    if(!cart)
+    {
+        return res.status(404).json({
+            message:"cart not found",
+            success:false
+        })
+    }
+    const stock=await stockOfVariant(productId,variantId);
+    const item=cart.items.find((item)=>item.product.toString()===productId && item.variant.toString()===variantId);
+    if(!item)
+    {
+        return res.status(404).json({
+            message:"item not found",
+            success:false
+        })
+    }
+    if(item.quantity+1>stock)
+    {
+        return res.status(400).json({
+            message:"Quantity exceeds stock",
+            success:false
+        })
+    }
+    item.quantity+=1;
+    await cart.save();
+    return res.status(200).json({
+        message:"Item incremented successfully",
+        success:true
+    })
+}
