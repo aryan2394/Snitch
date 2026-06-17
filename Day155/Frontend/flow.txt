@@ -1,0 +1,17 @@
+ab frontend ka flow humein frontend mein do pages banana hai first is seller can create the product and second pages is see all the product  which is created by seller
+
+
+we will break these problem in 5 statement
+
+1:create product pages
+2:view product
+3:make pages protected
+4:manage product state
+5:integrate backend api
+
+sabse last mein hum ui bananne ka kaam karte hai that is 1,2 and 3 
+kyonki pahale hum state and api call karte hai and uske husab se phur frontend se data maangenate hai 
+
+pahle hum bananyenge api se ineteratct karke backend se data laayenge 
+/product/api.js mein jaaake dono product se ineteratct karne wale function banao 
+ 
