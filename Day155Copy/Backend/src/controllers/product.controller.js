@@ -39,14 +39,53 @@ export async function getSellerProducts(req,res)
         products
     })
 }
-export async function getProducts(req,res)
-{
-    const products=await productModel.find();
-    res.status(200).json({
-        message:"products fetched sucessfully",
-        success:true,
-        products
-    })
+export async function getProducts(req, res) {
+    try {
+        const { q, page = 1, limit = 10 } = req.query;
+        let query = {};
+
+        if (q) {
+            const cleanQuery = q.trim();
+            if (cleanQuery) {
+                // Case-insensitive regex substring search on title or description
+                query.$or = [
+                    { title: { $regex: cleanQuery, $options: "i" } },
+                    { description: { $regex: cleanQuery, $options: "i" } }
+                ];
+            }
+        }
+
+        const pageNum = Math.max(1, parseInt(page) || 1);
+        const limitNum = Math.max(1, Math.min(100, parseInt(limit) || 10));
+        const skipNum = (pageNum - 1) * limitNum;
+
+        // Fetch products matching the query, sorting by newest first
+        const products = await productModel.find(query)
+            .sort({ createdAt: -1 })
+            .skip(skipNum)
+            .limit(limitNum);
+
+        const totalProducts = await productModel.countDocuments(query);
+
+        res.status(200).json({
+            message: "products fetched successfully",
+            success: true,
+            pagination: {
+                page: pageNum,
+                limit: limitNum,
+                totalPages: Math.ceil(totalProducts / limitNum),
+                totalProducts
+            },
+            products
+        });
+    } catch (err) {
+        console.error("Error in getProducts controller:", err);
+        res.status(500).json({
+            message: "Internal server error during search",
+            success: false,
+            error: err.message
+        });
+    }
 }
 export async function getProductDetails(req,res)
 {
