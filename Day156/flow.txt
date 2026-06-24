@@ -1,0 +1,60 @@
+abhi aap dekhoge toh cart mein humein ye karna hai ki user jab checkout pe click karein then 
+hum usko usko details fill karwaye and usse paymnet kaewaye jitna bhi usko payment karna hai 
+lekin wo toh amout pahle se hi dikh raha hai toh direclty utna amount pay karwa do 
+
+lekin ye wrong practice ye becacuse aapne jo hai wo total cart ka amoutn backend se nahi balki frontend mein hi calculate kiya hai which is a badd badd practice 
+
+matlab buss huein karara ha ki user ke cart mein jo amout dikh raha hai wo frontend pe hi calculate ho raha hai usko buss app backend se calculate karke frontend pe show karo 
+
+
+mujhe abhi ismein ek feature banana hai jaise ki if user has purchase the items and added in cart fro a few dayas but jaisse sale aaya toh amout badh jaata hai and khat jaata hai 
+user ko ek warning ya sucess message dena hai ki you have saved these amout or aapko itna mehanga pad raha hai
+
+these is the aggregate function for finding the amount in cart 
+
+
+db.getCollection('carts').aggregate(
+  [
+    { $unwind: { path: '$items' } },
+    {
+      $lookup: {
+        from: 'products',
+        localField: 'items.product',
+        foreignField: '_id',
+        as: 'items.product'
+      }
+    },
+    { $unwind: { path: '$items.product' } },
+    {
+      $unwind: { path: '$items.product.variants' }
+    },
+    {
+      $match: {
+        $expr: {
+          $eq: [
+            '$items.variant',
+            '$items.product.variants._id'
+          ]
+        }
+      }
+    },
+    {
+      $addFields: {
+        itemPrice: {
+          $multiply: [
+            '$items.quantity',
+            '$items.product.variants.price.amount'
+          ]
+        }
+      }
+    },
+    {
+      $group: {
+        _id: '$_id',
+        total: { $sum: '$itemPrice' },
+        items: { $push: '$items' }
+      }
+    }
+  ],
+  { maxTimeMS: 60000, allowDiskUse: true }
+);
