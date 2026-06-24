@@ -44,9 +44,11 @@ export async function addToCart(req, res) {
             },
             { new: true }
         )
+        const updatedCart = await getCartDetails(req.user._id);
         return res.status(200).json({
             success: true,
             message: "Item added to cart successfully",
+            cart: updatedCart
         })
     }
     if (quantity > stock) {
@@ -62,19 +64,17 @@ export async function addToCart(req, res) {
         price: product.variants.find((variant) => variant._id.toString() === variantId).price,
     });
     await cart.save();
+    const updatedCart = await getCartDetails(req.user._id);
     return res.status(200).json({
         success: true,
         message: "Item added to cart successfully",
+        cart: updatedCart
     })
 }
 export const getCart = async (req, res) => {
     const user = req.user
 
     let cart = await getCartDetails(user._id)
-
-    if (!cart) {
-        cart = await cartModel.create({ user: user._id })
-    }
 
     return res.status(200).json({
         message: "Cart fetched successfully",
@@ -117,9 +117,11 @@ export async function incrementCartItemQuantity(req, res) {
     }
     item.quantity += 1;
     await cart.save();
+    const updatedCart = await getCartDetails(req.user._id);
     return res.status(200).json({
         message: "Item incremented successfully",
-        success: true
+        success: true,
+        cart: updatedCart
     })
 }
 export async function decrementCartItemQuantity(req, res) {
@@ -159,9 +161,11 @@ export async function decrementCartItemQuantity(req, res) {
 
     await cart.save();
 
+    const updatedCart = await getCartDetails(req.user._id);
     return res.status(200).json({
         message: "Cart item updated successfully",
-        success: true
+        success: true,
+        cart: updatedCart
     });
 }
 export async function removeCartItem(req, res) {
@@ -196,9 +200,11 @@ export async function removeCartItem(req, res) {
     }
     cart.items=cart.items.filter((cartItem)=>cartItem.product.toString()!==productId || cartItem.variant.toString()!==variantId);
     await cart.save();
+    const updatedCart = await getCartDetails(req.user._id);
     return res.status(200).json({
-        message:"Item removed successfully",
-        success:true
+        message: "Item removed successfully",
+        success: true,
+        cart: updatedCart
     })
 }
 export async function createOrderController(req,res)

@@ -1,12 +1,19 @@
 import React, { useState } from 'react'
 import { useSelector } from 'react-redux'
 import { useNavigate, Link } from 'react-router'
+import { useAuth } from '../../auth/hook/useAuth'
 
 const Nav = () => {
     const navigate = useNavigate()
     const user = useSelector(state => state.auth.user)
     const cartItems = useSelector(state => state.cart?.items)
     const [searchQuery, setSearchQuery] = useState('')
+    const { handleLogout } = useAuth()
+
+    const handleLogoutClick = async () => {
+        await handleLogout()
+        navigate('/login')
+    }
 
     const handleSearchSubmit = (e) => {
         e.preventDefault()
@@ -59,6 +66,12 @@ const Nav = () => {
                         {user.role === 'seller' && (
                             <Link to="/seller/dashboard" className="transition-colors hover:text-[#C9A96E]">Seller Dashboard</Link>
                         )}
+                        <button
+                            onClick={handleLogoutClick}
+                            className="transition-colors hover:text-[#C9A96E] bg-transparent border-none uppercase tracking-[0.2em] font-medium text-[10px] cursor-pointer"
+                        >
+                            Logout
+                        </button>
                         <Link
                             to="/cart"
                             className="relative flex items-center hover:opacity-70 transition-opacity"

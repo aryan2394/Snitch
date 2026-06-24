@@ -1,5 +1,5 @@
 import { data } from "react-router";
-import { register, login, getMe, updateRole } from "../service/auth.api.js";
+import { register, login, getMe, updateRole, logout } from "../service/auth.api.js";
 import { setUser, setError, setLoading } from "../state/auth.slice.js";
 import { useDispatch } from "react-redux";
 export function useAuth() {
@@ -60,5 +60,18 @@ export function useAuth() {
             dispatch(setLoading(false));
         }
     }
-    return { handleRegister, handleLogin, handleGetMe, handleUpdateRole };
+    async function handleLogout() {
+        try {
+            dispatch(setLoading(true));
+            await logout();
+            dispatch(setUser(null));
+        }
+        catch (err) {
+            dispatch(setError(err.message || err));
+        }
+        finally {
+            dispatch(setLoading(false));
+        }
+    }
+    return { handleRegister, handleLogin, handleGetMe, handleUpdateRole, handleLogout };
 }

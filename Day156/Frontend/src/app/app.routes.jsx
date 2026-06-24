@@ -10,6 +10,7 @@ import ProductDetail from "../features/products/pages/ProductDetail";
 import SellerProductDetails from "../features/products/pages/SellerProductDetails";
 import Cart from "../features/cart/pages/Cart";
 import AppLayout from "./AppLayout";
+import ChooseRole from "../features/auth/pages/ChooseRole";
 // import OrderSuccess from "../features/cart/pages/OrderSuccess";
 
 const routes = createBrowserRouter([
@@ -21,6 +22,10 @@ const routes = createBrowserRouter([
     {
         path: "/login",
         element: <Login />,
+    },
+    {
+        path: "/choose-role",
+        element: <Protected role=""><ChooseRole /></Protected>,
     },
     {
         element: <AppLayout />,

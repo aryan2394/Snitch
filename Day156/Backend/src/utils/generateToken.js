@@ -22,6 +22,7 @@ export async function generateToken(user,res,message,statusCode)
                 id:user._id,
                 email:user.email,
                 fullname:user.fullname,
+                contact:user.contact,
                 role:user.role
             },
             token

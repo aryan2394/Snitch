@@ -15,6 +15,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
+app.set('trust proxy', true);
 app.use(express.json()); 
 app.use(morgan('dev'));
 app.use(cookieParser());
@@ -22,7 +23,8 @@ app.use(passport.initialize());
 passport.use(new GoogleStrategy({
     clientID: config.GOOGLE_CLIENT_ID,
     clientSecret: config.GOOGLE_CLIENT_SECRET,
-    callbackURL: "/api/auth/google/callback"
+    callbackURL: "/api/auth/google/callback",
+    proxy: true
   },
   function(accessToken, refreshToken, profile, done) {
     // Here you would typically find or create a user in your database
@@ -38,6 +40,11 @@ passport.use(new GoogleStrategy({
 app.use('/api/auth', authRouter);
 app.use('/api/products', productRouter);
 app.use('/api/cart',cartRouter); 
+
+// Keep-alive health check API
+app.get('/api/ping', (req, res) => {
+    res.status(200).json({ success: true, message: "pong" });
+});
 
 // Serve static React build files
 app.use(express.static(path.join(__dirname, '../public')));

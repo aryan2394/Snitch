@@ -302,6 +302,22 @@ const ProductDetail = () => {
                                         e.currentTarget.style.borderColor = '#d0c5b5';
                                         e.currentTarget.style.backgroundColor = 'transparent';
                                     }}
+                                    onClick={async () => {
+                                        try {
+                                            await handleAddItem({
+                                                productId: product._id,
+                                                variantId: activeVariant?._id,
+                                            });
+                                            navigate("/cart");
+                                        } catch (error) {
+                                            if (error.response?.status === 401) {
+                                                alert("Please login to buy items");
+                                                navigate("/login");
+                                            } else {
+                                                alert(error.response?.data?.message || "Failed to add item to cart");
+                                            }
+                                        }
+                                    }}
                                 >
                                     Buy Now
                                 </button>

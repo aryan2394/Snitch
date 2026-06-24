@@ -1,5 +1,5 @@
 import { addItem, getCart, incrementCartItemApi, decrementCartItemApi, removeCartItemApi,createCartOrder,verifyCartOrder } from "../service/cart.api.js";
-import { setItems, addItem as addItemToCart, incrementCartItem, decrementCartItem, removeCartItem } from "../state/cart.slice.js"
+import { setItems, addItem as addItemToCart } from "../state/cart.slice.js"
 import { useDispatch } from "react-redux"
 export const useCart = () => {
     const dispatch = useDispatch();
@@ -14,17 +14,23 @@ export const useCart = () => {
     async function handleIncrementCartItem({productId,variantId})
     {
         const data=await incrementCartItemApi({productId,variantId});
-        dispatch(incrementCartItem({productId,variantId}));
+        if (data.success && data.cart) {
+            dispatch(setItems(data.cart));
+        }
     }
     async function handleDecrementCartItem({productId,variantId})
     {
         const data=await decrementCartItemApi({productId,variantId});
-        dispatch(decrementCartItem({productId,variantId}));
+        if (data.success && data.cart) {
+            dispatch(setItems(data.cart));
+        }
     }
     async function handleRemoveCartItem({productId,variantId})
     {
         const data=await removeCartItemApi({productId,variantId});
-        dispatch(removeCartItem({productId,variantId}));
+        if (data.success && data.cart) {
+            dispatch(setItems(data.cart));
+        }
     }
     async function handleCreateCartOrder()
     {

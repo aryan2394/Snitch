@@ -2,6 +2,8 @@ import userModel from "../models/user.model.js";
 import { generateToken } from "../utils/generateToken.js";
 import jwt from "jsonwebtoken";
 import { config } from "../config/config.js";
+import redis from "../config/cache.js";
+
 export const register = async (req, res) => {
     const { email, contact, password, fullname, isSeller } = req.body;
     try {
@@ -43,6 +45,32 @@ export async function login(req, res) {
         res.status(500).json({ message: "Internal server error" });
     }
 }
+export async function logout(req, res) {
+    try {
+        const token = req.cookies.token;
+        if (token) {
+            const decoded = jwt.decode(token);
+            if (decoded && decoded.exp) {
+                const remainingTime = decoded.exp - Math.floor(Date.now() / 1000);
+                if (remainingTime > 0) {
+                    await redis.setex(`blacklist:${token}`, remainingTime, "true");
+                }
+            }
+        }
+        res.clearCookie("token", {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "lax",
+        });
+        return res.status(200).json({
+            success: true,
+            message: "Logged out successfully"
+        });
+    } catch (err) {
+        console.error("Logout error:", err);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+}
 export const googleCallback = async (req, res) => {
     try {
         const { id, displayName, emails } = req.user;
@@ -73,16 +101,18 @@ export const googleCallback = async (req, res) => {
         });
 
         // Redirect based on role
+        const frontendUrl = config.FRONTEND_URL || `${req.protocol}://${req.get('host')}`;
         if (user.role === "pending") {
-            return res.redirect(`${config.FRONTEND_URL}/choose-role`);
+            return res.redirect(`${frontendUrl}/choose-role`);
         } else if (user.role === "seller") {
-            return res.redirect(`${config.FRONTEND_URL}/seller/dashboard`);
+            return res.redirect(`${frontendUrl}/seller/dashboard`);
         } else {
-            return res.redirect(`${config.FRONTEND_URL || "/"}`);
+            return res.redirect(`${frontendUrl || "/"}`);
         }
     } catch (error) {
         console.error("Google Callback Error:", error);
-        return res.redirect(`${config.FRONTEND_URL}/login?error=auth_failed`);
+        const frontendUrl = config.FRONTEND_URL || `${req.protocol}://${req.get('host')}`;
+        return res.redirect(`${frontendUrl}/login?error=auth_failed`);
     }
 }
 export const getMe = async (req, res) => {
@@ -95,6 +125,7 @@ export const getMe = async (req, res) => {
                 id: user._id,
                 email: user.email,
                 fullname: user.fullname,
+                contact: user.contact,
                 role: user.role
             }
         });

@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import passport from 'passport';
-import { register, login, googleCallback, getMe, updateRole } from '../controllers/auth.controller.js';
+import { register, login, logout, googleCallback, getMe, updateRole } from '../controllers/auth.controller.js';
 import { registerValidation, loginValidation } from '../validator/auth.validator.js';
 import { authenticateSeller, authenticateUser } from '../middlewares/auth.middleware.js';
 import { config } from '../config/config.js';
@@ -17,6 +17,8 @@ router.post("/register", registerValidation, register);
 // @access: Public
 router.post("/login", loginValidation, login);
 
+
+router.post("/logout", authenticateUser, logout);
 
 // @route:  GET /auth/google
 // @desc:   Login a new user via google

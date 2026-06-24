@@ -1,12 +1,18 @@
 import jwt from 'jsonwebtoken';
 import userModel from '../models/user.model.js';
 import { config } from '../config/config.js';
+import redis from '../config/cache.js';
+
 export async function authenticateUser(req, res, next) {
     const token = req.cookies.token;
     if (!token) {
         return res.status(401).json({ message: "Unauthorized" });
     }
     try {
+        const isBlacklisted = await redis.get(`blacklist:${token}`);
+        if (isBlacklisted) {
+            return res.status(401).json({ message: "Unauthorized" });
+        }
         const decoded = jwt.verify(token, config.JWT_SECRET);
         const user = await userModel.findById(decoded.id);
         if (!user) {
@@ -26,6 +32,10 @@ export async function authenticateSeller(req, res, next) {
         return res.status(401).json({ message: "Unauthorized" });
     }
     try {
+        const isBlacklisted = await redis.get(`blacklist:${token}`);
+        if (isBlacklisted) {
+            return res.status(401).json({ message: "Unauthorized" });
+        }
         const decoded = jwt.verify(token, config.JWT_SECRET);
         const user = await userModel.findById(decoded.id);
         if (!user || user.role !== "seller") {

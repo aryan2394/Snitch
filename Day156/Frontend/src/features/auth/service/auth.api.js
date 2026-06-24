@@ -43,3 +43,13 @@ export async function updateRole({ role }) {
         throw err.response?.data || { message: err.message || 'Network Error' };
     }
 }
+export async function logout() {
+    try {
+        const response = await authApiInstance.post("/logout");
+        return response.data;
+    }
+    catch (err) {
+        console.log(err);
+        throw err.response?.data || { message: err.message || 'Network Error' };
+    }
+}

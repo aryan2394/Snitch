@@ -22,7 +22,7 @@ const tokens = {
 
 const Cart = () => {
     const cart = useSelector(state => state.cart)
-    const user=useSelector(state=>state.user);
+    const user = useSelector(state => state.auth.user);
     const { handleGetCart, handleIncrementCartItem, handleDecrementCartItem, handleRemoveCartItem,handleCreateCartOrder,handleVerifyCartOrder } = useCart()
     const navigate = useNavigate()
     const {error,isLoading,Razorpay}=useRazorpay();
@@ -75,7 +75,7 @@ const Cart = () => {
         }
       },
       prefill: {
-        name: user?.fullName,
+        name: user?.fullname,
         email: user?.email,
         contact: user?.contact,
       },
