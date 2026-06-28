@@ -1,22 +1,22 @@
 import React, { useEffect, useState } from 'react'
 import { useProduct } from '../hooks/useProduct';
-import { useParams } from 'react-router';
+import { useParams, useNavigate } from 'react-router';
 
 // Helper icons
 const PlusIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>;
 const TrashIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>;
 
 const SellerProductDetails = () => {
-  const [ product, setProduct ] = useState(null);
-  const [ localVariants, setLocalVariants ] = useState([]);
-  const [ isAddingVariant, setIsAddingVariant ] = useState(false);
-  const [ loading, setLoading ] = useState(true);
+  const [product, setProduct] = useState(null);
+  const [localVariants, setLocalVariants] = useState([]);
+  const [isAddingVariant, setIsAddingVariant] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   // UI state for inputs to maintain focus
-  const [ attributeInputs, setAttributeInputs ] = useState([ { key: '', value: '' } ]);
+  const [attributeInputs, setAttributeInputs] = useState([{ key: '', value: '' }]);
 
   // New variant state
-  const [ newVariant, setNewVariant ] = useState({
+  const [newVariant, setNewVariant] = useState({
     images: [],
     stock: 0,
     attributes: {}, // Strictly an object
@@ -24,7 +24,20 @@ const SellerProductDetails = () => {
   });
 
   const { productId } = useParams();
-  const { handleGetProductById, handleAddProductVariant } = useProduct();
+  const navigate = useNavigate();
+  const { handleGetProductById, handleAddProductVariant, handleDeleteProduct } = useProduct();
+
+  const handleDelete = async () => {
+    if (window.confirm("Are you sure you want to delete this product? This action cannot be undone.")) {
+      try {
+        await handleDeleteProduct(productId);
+        navigate("/seller/dashboard");
+      } catch (error) {
+        console.error("Failed to delete product", error);
+        alert("Failed to delete product.");
+      }
+    }
+  };
 
   async function fetchProductDetails() {
     setLoading(true);
@@ -45,12 +58,12 @@ const SellerProductDetails = () => {
 
   useEffect(() => {
     fetchProductDetails();
-  }, [ productId ]);
+  }, [productId]);
 
   // Handlers for modifying existing variant stock natively
   const handleStockChange = (index, newStock) => {
-    const updatedVariants = [ ...localVariants ];
-    updatedVariants[ index ] = { ...updatedVariants[ index ], stock: Number(newStock) };
+    const updatedVariants = [...localVariants];
+    updatedVariants[index] = { ...updatedVariants[index], stock: Number(newStock) };
     setLocalVariants(updatedVariants);
   };
 
@@ -78,14 +91,14 @@ const SellerProductDetails = () => {
         : undefined // price is optional
     };
 
-    setLocalVariants([ ...localVariants, variantToSave ]);
+    setLocalVariants([...localVariants, variantToSave]);
     setIsAddingVariant(false);
 
     await handleAddProductVariant(productId, variantToSave)
 
     // Reset form
     // Note: should ideally revoke old object URLs as well to prevent memory leaks if it were a long-lived SPA
-    setAttributeInputs([ { key: '', value: '' } ]);
+    setAttributeInputs([{ key: '', value: '' }]);
     setNewVariant({
       images: [],
       stock: 0,
@@ -95,19 +108,19 @@ const SellerProductDetails = () => {
   };
 
   const handleAddAttribute = () => {
-    setAttributeInputs(prev => [ ...prev, { key: '', value: '' } ]);
+    setAttributeInputs(prev => [...prev, { key: '', value: '' }]);
   };
 
   const handleAttributeChange = (index, field, value) => {
-    const updatedInputs = [ ...attributeInputs ];
-    updatedInputs[ index ][ field ] = value;
+    const updatedInputs = [...attributeInputs];
+    updatedInputs[index][field] = value;
     setAttributeInputs(updatedInputs);
 
     // Synchronize to object format
     const newAttrsObj = {};
     updatedInputs.forEach(attr => {
       if (attr.key.trim() !== '') {
-        newAttrsObj[ attr.key.trim() ] = attr.value;
+        newAttrsObj[attr.key.trim()] = attr.value;
       }
     });
     setNewVariant(prev => ({ ...prev, attributes: newAttrsObj }));
@@ -121,7 +134,7 @@ const SellerProductDetails = () => {
     const newAttrsObj = {};
     updatedInputs.forEach(attr => {
       if (attr.key.trim() !== '') {
-        newAttrsObj[ attr.key.trim() ] = attr.value;
+        newAttrsObj[attr.key.trim()] = attr.value;
       }
     });
     setNewVariant(prev => ({ ...prev, attributes: newAttrsObj }));
@@ -145,7 +158,7 @@ const SellerProductDetails = () => {
 
     setNewVariant(prev => ({
       ...prev,
-      images: [ ...prev.images, ...newImageObjects ]
+      images: [...prev.images, ...newImageObjects]
     }));
 
     // Clear the input so identical files can be selected again if needed
@@ -153,7 +166,7 @@ const SellerProductDetails = () => {
   };
 
   const handleRemoveImage = (index) => {
-    const imageToRemove = newVariant.images[ index ];
+    const imageToRemove = newVariant.images[index];
     if (imageToRemove?.previewUrl) {
       URL.revokeObjectURL(imageToRemove.previewUrl);
     }
@@ -184,7 +197,7 @@ const SellerProductDetails = () => {
             {/* Gallery placeholder */}
             <div className="w-full aspect-[4/5] bg-[#f5f3f0] overflow-hidden">
               {product.images && product.images.length > 0 ? (
-                <img src={product.images[ 0 ].url} alt={product.title} className="w-full h-full object-cover" />
+                <img src={product.images[0].url} alt={product.title} className="w-full h-full object-cover" />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-[#7f7668]">No Image</div>
               )}
@@ -205,6 +218,13 @@ const SellerProductDetails = () => {
             <div className="text-2xl tracking-wide font-light mb-8">
               {product.price?.amount} {product.price?.currency}
             </div>
+
+            <button
+              onClick={handleDelete}
+              className="w-fit bg-[#ba1a1a] text-[#ffffff] px-6 py-3 uppercase tracking-wider text-sm hover:bg-[#93000a] transition-colors flex items-center gap-2 cursor-pointer mt-2"
+            >
+              <TrashIcon /> Delete Product
+            </button>
           </div>
         </section>
 
@@ -364,7 +384,7 @@ const SellerProductDetails = () => {
                     {/* Variant Thumb */}
                     <div className="w-16 h-20 bg-[#f5f3f0] shrink-0">
                       {variant.images && variant.images.length > 0 ? (
-                        <img src={variant.images[ 0 ].url} alt="Variant" className="w-full h-full object-cover" />
+                        <img src={variant.images[0].url} alt="Variant" className="w-full h-full object-cover" />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-xs text-[#7f7668]">N/A</div>
                       )}
@@ -372,7 +392,7 @@ const SellerProductDetails = () => {
                     {/* Attributes */}
                     <div className="flex-1 min-w-0">
                       <div className="flex flex-wrap gap-2 mb-2">
-                        {Object.entries(variant.attributes || {}).map(([ key, val ]) => (
+                        {Object.entries(variant.attributes || {}).map(([key, val]) => (
                           <span key={key} className="bg-[#f5f3f0] px-2 py-1 text-xs uppercase tracking-wider text-[#4d463a]">
                             <span className="text-[#a8a094]">{key}:</span> {val}
                           </span>

@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import passport from 'passport';
-import { register, login, logout, googleCallback, getMe, updateRole } from '../controllers/auth.controller.js';
+import { register, login, logout, googleCallback, getMe, updateRole, initiateGoogleAuth, authenticateGoogleCallback } from '../controllers/auth.controller.js';
 import { registerValidation, loginValidation } from '../validator/auth.validator.js';
 import { authenticateSeller, authenticateUser } from '../middlewares/auth.middleware.js';
 import { config } from '../config/config.js';
@@ -23,19 +23,13 @@ router.post("/logout", authenticateUser, logout);
 // @route:  GET /auth/google
 // @desc:   Login a new user via google
 // @access: Public
-router.get("/google", passport.authenticate("google", { scope: ["profile", "email"] }));
+router.get("/google", initiateGoogleAuth);
 
 
 // @route:  GET /auth/google/callback
 // @desc:   Callback for google authentication
 // @access: Public
-router.get("/google/callback",
-  passport.authenticate("google", {
-    failureRedirect: `${config.FRONTEND_URL}/login`,
-    session: false
-  }),
-  googleCallback
-);
+router.get("/google/callback", authenticateGoogleCallback, googleCallback);
 
 
 // @route:  GET /auth/me

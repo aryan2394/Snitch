@@ -159,4 +159,36 @@ export async function addProductVariant(req,res)
         success:true,
         product
      }) 
-} 
+}
+
+export async function deleteProduct(req, res) {
+    try {
+        const productId = req.params.productId;
+        const sellerId = req.user._id;
+
+        const deletedProduct = await productModel.findOneAndDelete({
+            _id: productId,
+            seller: sellerId
+        });
+
+        if (!deletedProduct) {
+            return res.status(404).json({
+                message: "Product not found or you are not authorized to delete this product",
+                success: false
+            });
+        }
+
+        res.status(200).json({
+            message: "Product deleted successfully",
+            success: true,
+            product: deletedProduct
+        });
+    } catch (err) {
+        console.error("Error in deleteProduct controller:", err);
+        res.status(500).json({
+            message: "Internal server error",
+            success: false,
+            error: err.message
+        });
+    }
+}

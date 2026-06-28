@@ -3,6 +3,7 @@ import { generateToken } from "../utils/generateToken.js";
 import jwt from "jsonwebtoken";
 import { config } from "../config/config.js";
 import redis from "../config/cache.js";
+import passport from "passport";
 
 export const register = async (req, res) => {
     const { email, contact, password, fullname, isSeller } = req.body;
@@ -71,6 +72,47 @@ export async function logout(req, res) {
         return res.status(500).json({ message: "Internal server error" });
     }
 }
+export const initiateGoogleAuth = (req, res, next) => {
+    const fromQuery = req.query.from;
+    const referer = req.get('referer') || '';
+    
+    let frontendOrigin = fromQuery || '';
+    if (!frontendOrigin && referer) {
+        try {
+            frontendOrigin = new URL(referer).origin;
+        } catch (e) {
+            // ignore malformed referer
+        }
+    }
+    
+    // Security Whitelist to prevent Open Redirect
+    const allowedOrigins = [
+        "https://snitch-3rrv.onrender.com"
+    ];
+    
+    const isLocalhost = frontendOrigin.startsWith("http://localhost:") || 
+                        frontendOrigin.startsWith("http://127.0.0.1:") || 
+                        frontendOrigin === "http://localhost" || 
+                        frontendOrigin === "http://127.0.0.1";
+                        
+    if (!isLocalhost && !allowedOrigins.includes(frontendOrigin)) {
+        frontendOrigin = config.FRONTEND_URL || `${req.protocol}://${req.get('host')}`;
+    }
+
+    passport.authenticate("google", {
+        scope: ["profile", "email"],
+        state: frontendOrigin
+    })(req, res, next);
+};
+
+export const authenticateGoogleCallback = (req, res, next) => {
+    const state = req.query.state || config.FRONTEND_URL || '';
+    passport.authenticate("google", {
+        failureRedirect: `${state}/login?error=auth_failed`,
+        session: false
+    })(req, res, next);
+};
+
 export const googleCallback = async (req, res) => {
     try {
         const { id, displayName, emails } = req.user;
@@ -100,8 +142,8 @@ export const googleCallback = async (req, res) => {
             sameSite: "lax",
         });
 
-        // Redirect based on role
-        const frontendUrl = config.FRONTEND_URL || `${req.protocol}://${req.get('host')}`;
+        // Dynamic redirect using req.query.state
+        const frontendUrl = req.query.state || config.FRONTEND_URL || `${req.protocol}://${req.get('host')}`;
         if (user.role === "pending") {
             return res.redirect(`${frontendUrl}/choose-role`);
         } else if (user.role === "seller") {
@@ -111,7 +153,7 @@ export const googleCallback = async (req, res) => {
         }
     } catch (error) {
         console.error("Google Callback Error:", error);
-        const frontendUrl = config.FRONTEND_URL || `${req.protocol}://${req.get('host')}`;
+        const frontendUrl = req.query.state || config.FRONTEND_URL || `${req.protocol}://${req.get('host')}`;
         return res.redirect(`${frontendUrl}/login?error=auth_failed`);
     }
 }

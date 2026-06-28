@@ -4,7 +4,7 @@ const ContinueWithGoogle = () => {
   return (
     <>
      <a
-                                href="/api/auth/google"
+                                href={`/api/auth/google?from=${encodeURIComponent(window.location.origin)}`}
                                 className="w-full py-4 text-[11px] uppercase tracking-[0.25em] font-medium transition-all duration-300 flex items-center justify-center gap-2"
                                 style={{ border: '1px solid #d0c5b5', color: '#1b1c1a', fontFamily: "'Inter', sans-serif", textDecoration: 'none' }}
                                 onMouseEnter={e => { e.currentTarget.style.borderColor = '#C9A96E'; e.currentTarget.style.color = '#C9A96E'; }}

@@ -1,6 +1,6 @@
 import {Router} from 'express';
 import {authenticateSeller, authenticateUser} from '../middlewares/auth.middleware.js';
-import {createProduct,getSellerProducts,getProducts, getProductDetails, addProductVariant} from '../controllers/product.controller.js';
+import {createProduct,getSellerProducts,getProducts, getProductDetails, addProductVariant, deleteProduct} from '../controllers/product.controller.js';
 import {upload} from '../middlewares/multer.middleware.js';
 import {validateProduct} from '../validator/product.validator.js';
 const router=Router();
@@ -31,4 +31,10 @@ router.get("/detail/:id",getProductDetails);
 // @desc Add variants to a product
 // @access Private (Seller only) 
 router.post("/:productId/variants",authenticateSeller,upload.array("images",7),addProductVariant);
+
+// @route DELETE /api/products/:productId
+// @desc Delete a product
+// @access Private (Seller only)
+router.delete("/:productId", authenticateSeller, deleteProduct);
+
 export default router; 
