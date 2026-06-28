@@ -86,16 +86,14 @@ export const initiateGoogleAuth = (req, res, next) => {
     }
     
     // Security Whitelist to prevent Open Redirect
-    const allowedOrigins = [
-        "https://snitch-3rrv.onrender.com"
-    ];
+    const isRender = frontendOrigin.startsWith("https://") && frontendOrigin.endsWith(".onrender.com");
     
     const isLocalhost = frontendOrigin.startsWith("http://localhost:") || 
                         frontendOrigin.startsWith("http://127.0.0.1:") || 
                         frontendOrigin === "http://localhost" || 
                         frontendOrigin === "http://127.0.0.1";
                         
-    if (!isLocalhost && !allowedOrigins.includes(frontendOrigin)) {
+    if (!isLocalhost && !isRender) {
         frontendOrigin = config.FRONTEND_URL || `${req.protocol}://${req.get('host')}`;
     }
 
